@@ -1,0 +1,33 @@
+# run the command below to install the required packages for the project. This includes libraries for data manipulation, XML parsing, machine learning, text processing, and utilities for progress bars and model saving/loading.
+# pip install -r requirements.txt
+
+# Data Manipulation
+pandas>=1.3.0
+numpy>=1.21.0
+
+# XML Parsing (Better than built-in for large dumps)
+lxml
+
+# Dimensionality Reduction & Clustering
+scikit-learn>=1.0.0 # For normalization and potential future modeling tasks
+umap-learn # For dimensionality reduction and visualization of high-dimensional data
+
+# Text Processing (Crucial for an "Editor")
+nltk # For basic NLP tasks like tokenization and stopword removal
+spacy>=3.7.0 # For advanced NLP tasks like named entity recognition and dependency parsing
+# After installing, download the SpaCy model: python -m spacy download en_core_web_md
+beautifulsoup4 # For parsing HTML content
+
+# Visualization
+bokeh>=3.0.0
+jinja2        # Required by Bokeh for HTML templating
+holoviews     # If you want to wrap Bokeh in simpler high-level syntax
+colorcet      # Better perceptually uniform colormaps for clusters
+streamlit      # For building interactive web apps to label clusters (optional, can be used instead of Bokeh for the labeling tool if we want a more user-friendly interface)
+plotly         # For interactive visualizations, if you want to explore alternatives to Bokeh
+
+# Utilities
+pyyaml
+tqdm        # Adds progress bars to your loops
+matplotlib # For data visualization
+joblib # For saving and loading models and pipelines

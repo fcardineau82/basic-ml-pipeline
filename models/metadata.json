@@ -1,0 +1,6 @@
+{
+  "model_type": "random_forest",
+  "label_type": "quality_based",
+  "median_threshold": null,
+  "training_date": "2026-02-17T15:51:54.353721"
+}

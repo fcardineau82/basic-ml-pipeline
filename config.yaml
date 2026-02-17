@@ -1,0 +1,54 @@
+# config.yaml
+paths:
+  raw_xml: "data/raw/Posts.xml"
+  interim_csv: "data/processed/writers_data.csv" #the name is a bit misleading, but it is the output of the parsing step and the input for the normalization step will refactor later. at the moment interim_csv == train_csv
+  final_csv: "data/processed/writers_Q&A.csv"
+  normalized_csv: "data/processed/normalized_data.csv"
+  samples_csv: "data/processed/samples.csv"
+  output_dir: "data/html_output/"
+  labeler_script: "src/labeler_app.py" # Path to the Streamlit app for manual labeling
+  train_csv: "data/processed/train.csv" # This is the output of the splitting step and the input for the clustering and analysis steps --> training data 
+  test_csv: "data/processed/test.csv" # This is the output of the splitting step and the input for the clustering and analysis steps --> testing data
+
+parsing:
+    limit_test: false # Set to true to limit the number of rows processed during the parsing step for testing purposes. This can speed up development and debugging by working with a smaller subset of the data. When set to false, the parser will process the entire dataset.
+    target_post_type: "1" # Questions only
+
+splitting: # This section defines the parameters for splitting the dataset into training and testing sets. 
+  train_size: 0.7 # Proportion of the dataset to include in the training set (e.g., 0.7 for 70% training data and 30% testing data)
+  random_state: 42 # Random seed for reproducibility of the train-test split. Setting this to a fixed value ensures that the same split is generated each time the code is run, which is important for consistent results during development and testing.
+  group_column: "OwnerUserId"  # The "dimension" to split on
+
+visuals:
+  body_length_limit: 2000
+  bins: 60
+
+
+
+features: # This section defines the types of features in the dataset, which will guide how we preprocess them. We categorize features into numeric, categorical, date, and text types. This categorization is crucial for applying the appropriate transformations during the normalization process.
+  numeric: [] # other feature 'AnswerCount''CommentCount', 'AnswerCount', , 'ViewCount', 'AcceptedAnswerId', 'PostTypeId', 'Score', 'FavoriteCount' are not included because they are not relevant for clustering and will be used in the analysis phase instead.
+  categorical: [] # 'Tags'
+  date: [] #  'CreationDate' is not included because we will extract temporal features from it (like year, month, day) and use those instead of the raw date for clustering. 
+  text: ['Title', 'Body'] # 'Title', 'Body' are not included because they are too noisy and we want to focus on the tags for clustering.
+  use_quality_features: true # Set to true to include the quality features extracted by our custom transformer in the clustering process from feature_engineering.py - currently Add: Title Length, Body Length, Punctuation, Caps Ratio.
+
+text_vectorizer: # This section configures the text vectorization process. We specify which SpaCy model to use for converting text into vectors. The compression subsection allows us to enable or disable dimensionality reduction using Singular Value Decomposition (SVD) and set the target number of dimensions if compression is enabled.
+  model: "en_core_web_md" # SpaCy model to use for text vectorization (e.g., 'en_core_web_sm', 'en_core_web_md', 'en_core_web_lg')
+  compression:
+    enabled: true        # Set to false to disable SVD
+    n_components: 100     # Target dimensions
+
+manual_label:
+  keys: ["Question_quality", "Answer_quality"] # This is a list of predefined labels that can be used in the manual labeling tool. Users can select from these existing keys when labeling clusters, and they can also create new keys which will be added to this list and persisted in the config.yaml file for future use. 
+
+model: # Configuration for machine learning model training
+  algorithm: "random_forest" # Model type: 'random_forest', 'logistic_regression', 'gradient_boosting'
+  random_state: 42 # Random seed for reproducibility
+  output_dir: "models/" # Directory to save trained models and artifacts
+  # Model-specific parameters can be added here for hyperparameter tuning
+  random_forest:
+    n_estimators: 100
+    class_weight: 'balanced' # This option automatically adjusts weights inversely proportional to class frequencies
+    oob_score: True # Use out-of-bag samples to estimate the generalization accuracy
+    max_depth: null # null means no limit
+    min_samples_split: 2
